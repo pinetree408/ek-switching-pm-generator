@@ -5,12 +5,14 @@
   {% for key, value in value.items%}
     {% if forloop.first %}
       <td>{{key}}</td>
-      <td>{{value}}</td>
+      <td>{{value.0}}</td>
+      <td>{{value.1}}</td>
     </tr>
     {% else %}
       <tr>
         <td>{{key}}</td>
-	<td>{{value}}</td>
+	<td>{{value.0}}</td>
+	<td>{{value.1}}</td>
       </tr>	    
     {% endif %}
   {% endfor %}

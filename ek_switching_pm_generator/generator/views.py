@@ -8,5 +8,7 @@ class GeneratorView(TemplateView):
 
     def get_context_data(self, *args, **kwargs):
         context = super(GeneratorView, self).get_context_data(*args, **kwargs)
-        context['result'] = pm.calculator(settings.BASE_DIR + "/frequency.txt")
+        frequency = settings.BASE_DIR + "/frequency.txt"
+        dictionary = settings.BASE_DIR + "/wordsKo.txt"
+        context['result'] = pm.calculator(frequency, dictionary)
         return context
