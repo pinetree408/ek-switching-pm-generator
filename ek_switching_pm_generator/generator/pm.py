@@ -49,12 +49,10 @@ def change_complete_korean(word, file):
     f = open(file, 'r')
     lines = f.readlines()
 
-    print 'test0'
     for line in lines:
         dic = line.decode('utf-8').split('\n')[0]
         frq = ''.join(result)
         if dic == frq:
-            print dic + ':' + frq
             f.close()
             return 1
     f.close()
@@ -71,17 +69,41 @@ def is_complete_korean(word):
 
     import re
     c = re.compile(regex)
+    
+    english = len(word)
 
-    english = len(word) 
-    korean = 0
-    m = c.match(word)
-    if bool(m) == True:
-        matched = m.group(0)
-	korean = len(matched)
+    result = {}
+    for i in range(len(word)):
+	if i == 0:
+            continue
+        temp = word[0:i+1]
+        korean = 0
+	while len(temp) != 0:
+            m = c.match(temp)
+	    if bool(m) == True:
+                korean = korean + len(m.group(0))
+                temp = temp.split(m.group(0))[1]
+            else:
+                break
+        final = {}
+	if korean == 0:
+            final[0] = 1
+        else:
+            final[0] = 0
+        for j in range(i+1):
+            if j == 0:
+                continue
+            if j + 1 == korean:
+                final[j+1] = 1
+            else:
+                final[j+1] = 0
+        result[i+1] = final
+    return [english, result]
 
-    return [english, korean]
-
-
+is_complete_korean('system')
+is_complete_korean('ghxpf')
+is_complete_korean('aard')
+is_complete_korean('aak')
 
 def calculator(frequency_file, k_dict_file):
     f = open(frequency_file, 'r')
@@ -91,32 +113,47 @@ def calculator(frequency_file, k_dict_file):
     for line in lines:
         words = line.split('	')
         ick = is_complete_korean(words[1])
-	ick.append(change_complete_korean(words[1], k_dict_file))
+	#ick.append(change_complete_korean(words[1], k_dict_file))
+	#ick.append(0)
         result.append(ick)
 
     final_result = {}
     for i in range(len(result)):
 	if result[i][0] in final_result.keys():
-            if not(result[i][1] in final_result[result[i][0]].keys()):
-	        final_result[result[i][0]][result[i][1]] = [1, result[i][2]]
-            else:
-                before_updated = final_result[result[i][0]][result[i][1]]
-                updated = before_updated[0] + 1
-		updated_ick = before_updated[1] + result[i][2]
-                del final_result[result[i][0]][result[i][1]]
-                final_result[result[i][0]][result[i][1]] = [updated, updated_ick] 
+            for key in final_result[result[i][0]].keys():
+                for sub_key in final_result[result[i][0]][key].keys():
+                    if result[i][1][key][sub_key] == 1:
+                        updated = final_result[result[i][0]][key][sub_key]
+                        del final_result[result[i][0]][key][sub_key]
+		        final_result[result[i][0]][key][sub_key] = updated + 1
         else:
-            final_result[result[i][0]] = {result[i][1] : [1, result[i][2]]}
+            final_result[result[i][0]] = {}
+            for key in result[i][1].keys():
+                final_result[result[i][0]][key] = {}
+                for sub_key in result[i][1][key].keys():
+                    final_result[result[i][0]][key][sub_key] = result[i][1][key][sub_key]
+    del final_result[1]
 
-    for key in final_result.keys():
+    import copy
+    temp_final_result = copy.deepcopy(final_result)
+    change_final_result = {}
+    for key in temp_final_result.keys():
+        for sub_key in temp_final_result[key].keys():
+            if sub_key in change_final_result.keys():
+                for trb_key in temp_final_result[key][sub_key].keys():
+                    updated = change_final_result[sub_key][trb_key]
+		    del change_final_result[sub_key][trb_key]
+		    change_final_result[sub_key][trb_key] = updated + temp_final_result[key][sub_key][trb_key]
+            else:
+                change_final_result[sub_key] = temp_final_result[key][sub_key]
+
+    for key in change_final_result.keys():
         sum = 0.0
-        for sub_key in final_result[key].keys():
-            sum = sum + final_result[key][sub_key][0]
-        for sub_key in final_result[key].keys():
-            updated = (final_result[key][sub_key][0] / sum) * 100
-	    updated_ick = (final_result[key][sub_key][1] / float(final_result[key][sub_key][0])) * 100
-            del final_result[key][sub_key]
-	    final_result[key][sub_key] = [round(updated, 2), updated_ick]
-
+        for sub_key in change_final_result[key].keys():
+            sum = sum + change_final_result[key][sub_key]#[0]
+        for sub_key in change_final_result[key].keys():
+            updated = (change_final_result[key][sub_key] / sum) * 100
+            del change_final_result[key][sub_key]
+	    change_final_result[key][sub_key] = round(updated, 2)
     f.close()
-    return final_result
+    return [final_result, change_final_result]

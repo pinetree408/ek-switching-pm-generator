@@ -39,6 +39,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     #ek swithcing pm generator 
     'generator',
+    'mathfilters',
 )
 
 MIDDLEWARE_CLASSES = (
