@@ -59,8 +59,7 @@ def change_complete_korean(word, file):
     return 0
 
 
-def is_complete_korean(word):
-
+def is_complete_korean(word, word_frequency, option):
     regH = "[rRseEfaqQtTdwWczxvg]"
     regB = "hk|ho|hl|nj|np|nl|ml|k|o|i|O|j|p|u|P|h|y|n|b|m|l";
     regF = "rt|sw|sg|fr|fa|fq|ft|fx|fv|fg|qt|r|R|s|e|f|a|q|t|T|d|w|c|z|x|v|g|";
@@ -87,45 +86,49 @@ def is_complete_korean(word):
                 break
         final = {}
 	if korean == 0:
-            final[0] = 1
+            if option == 0:
+                final[0] = 1.0 * (float(word_frequency) / 1000000000)
+            else:
+                final[0] = 1.0
         else:
-            final[0] = 0
+            final[0] = 0.0
         for j in range(i+1):
             if j == 0:
                 continue
             if j + 1 == korean:
-                final[j+1] = 1
+                if option == 0:
+                    final[j+1] = 1.0 * (float(word_frequency) / 1000000000)
+                else:
+		    final[j+1] = 1.0
             else:
-                final[j+1] = 0
+                final[j+1] = 0.0
         result[i+1] = final
     return [english, result]
 
-is_complete_korean('system')
-is_complete_korean('ghxpf')
-is_complete_korean('aard')
-is_complete_korean('aak')
 
-def calculator(frequency_file, k_dict_file):
+def calculator(frequency_file, k_dict_file, option):
     f = open(frequency_file, 'r')
     lines = f.readlines()
 
     result = []
+    sum = 0.0
     for line in lines:
         words = line.split('	')
-        ick = is_complete_korean(words[1])
-	#ick.append(change_complete_korean(words[1], k_dict_file))
-	#ick.append(0)
+        ick = is_complete_korean(words[1], words[2], option)
+        sum = sum + float(words[2])
         result.append(ick)
+    print sum
+
 
     final_result = {}
     for i in range(len(result)):
 	if result[i][0] in final_result.keys():
             for key in final_result[result[i][0]].keys():
                 for sub_key in final_result[result[i][0]][key].keys():
-                    if result[i][1][key][sub_key] == 1:
+                    if result[i][1][key][sub_key] != 0:
                         updated = final_result[result[i][0]][key][sub_key]
                         del final_result[result[i][0]][key][sub_key]
-		        final_result[result[i][0]][key][sub_key] = updated + 1
+		        final_result[result[i][0]][key][sub_key] = updated + result[i][1][key][sub_key]
         else:
             final_result[result[i][0]] = {}
             for key in result[i][1].keys():

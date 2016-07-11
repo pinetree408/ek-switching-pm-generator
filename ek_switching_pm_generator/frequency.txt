@@ -998,7 +998,6 @@
 998	lead	79418.8
 999	move	79376.1
 1000	names	79366.6
-Rank	Word	Count (per billion)
 1001	stop	79301.7
 1002	higher	79280.3
 1003	et	79225.0
@@ -2998,7 +2997,6 @@ Rank	Word	Count (per billion)
 2998	remote	25339.2
 2999	finish	25337.6
 3000	flag	25313.9
-Rank	Word	Count (per billion)
 3001	boots	25307.6
 3002	enabled	25290.1
 3003	administration	25289.4
@@ -3999,7 +3997,6 @@ Rank	Word	Count (per billion)
 3998	donation	17715.0
 3999	steamer	17714.2
 4000	witnesses	17712.7
-Rank	Word	Count (per billion)
 4001	specified	17710.3
 4002	learnt	17698.4
 4003	stores	17677.9
@@ -5000,7 +4997,6 @@ Rank	Word	Count (per billion)
 4998	manhood	13257.0
 4999	quantities	13246.7
 5000	interpretation	13245.9
-Rank	Word	Count (per billion)
 5001	dressing	13242.0
 5002	rejoiced	13241.2
 5003	Edinburgh	13238.8
@@ -6001,7 +5997,6 @@ Rank	Word	Count (per billion)
 5998	bury	10267.3
 5999	efficient	10266.5
 6000	mix	10266.5
-Rank	Word	Count (per billion)
 6001	supporting	10266.5
 6002	actor	10261.8
 6003	disturbance	10261.0
@@ -7002,7 +6997,6 @@ Rank	Word	Count (per billion)
 6998	singer	8028.43
 6999	spaces	8027.64
 7000	Emerson	8026.06
-Rank	Word	Count (per billion)
 7001	disguised	8023.68
 7002	antique	8022.10
 7003	orthodox	8019.73
@@ -8003,7 +7997,6 @@ Rank	Word	Count (per billion)
 7998	transition	6337.77
 7999	button	6334.61
 8000	headache	6332.24
-Rank	Word	Count (per billion)
 8001	tenant	6331.44
 8002	burns	6330.65
 8003	harmonious	6329.86
@@ -9004,7 +8997,6 @@ Rank	Word	Count (per billion)
 8998	narrowly	4950.12
 8999	Collins	4948.54
 9000	insulting	4946.96
-Rank	Word	Count (per billion)
 9001	deficiency	4945.38
 9002	operating	4943.79
 9003	overthrown	4942.21
