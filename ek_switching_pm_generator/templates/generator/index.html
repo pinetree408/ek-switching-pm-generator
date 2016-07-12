@@ -1,5 +1,6 @@
 {% load mathfilters %}
-<!--<table border=1 style="width:45%; float:left;">
+<!--
+<table border=1 style="width:45%; float:left;">
 {% for key, value in result.0.items %}
   {% with temp=key|add:1 %} 
   {% with temp2=key|mul:temp %} 
@@ -43,7 +44,9 @@
   {% endwith %}
   {% endwith %}
 {% endfor %}
-</table>-->
+</table>
+-->
+<!--
 <table border=1 style="width:45%; float:left;">
 {% for key, value in preresult.1.items %}
   <tr>
@@ -51,17 +54,18 @@
   {% for key, value in value.items%}
     {% if forloop.first %}
       <td>{{key}}</td>
-      <td>{{value}}</td>
+      <td>{{value.0}}</td>
     </tr>
     {% else %}
       <tr>
         <td>{{key}}</td>
-	<td>{{value}}</td>
+	<td>{{value.0}}</td>
       </tr>	    
     {% endif %}
   {% endfor %}
 {% endfor %}
-</table> 
+</table>
+-->
 <table border=1 style="width:45%; float:left;">
 {% for key, value in result.1.items %}
   <tr>
@@ -69,12 +73,14 @@
   {% for key, value in value.items%}
     {% if forloop.first %}
       <td>{{key}}</td>
-      <td>{{value}}</td>
+      <td>{{value.0}}</td>
+      <td>{{value.1}}</td>
     </tr>
     {% else %}
       <tr>
         <td>{{key}}</td>
-	<td>{{value}}</td>
+	<td>{{value.0}}</td>
+	<td>{{value.1}}</td>
       </tr>	    
     {% endif %}
   {% endfor %}
