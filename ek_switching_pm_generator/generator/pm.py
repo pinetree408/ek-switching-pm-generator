@@ -185,23 +185,6 @@ def calculator(frequency_file, k_dict_file, option):
 
     result = pool.map(wrapper, input_seq)
 
-    '''
-    result = []
-    sum = 0.0
-    i = 0
-    for line in lines:
-        print i
-        #if i == 10:
-	#    break
-        words = line.split('	')
-        ick = is_complete_korean(words[1], words[2], option, k_dict_file)
-        #print ick
-        sum = sum + float(words[2])
-        result.append(ick)
-	i = i + 1
-    print sum
-    '''
-
     final_result = {}
     for i in range(len(result)):
 	if result[i][0] in final_result.keys():
