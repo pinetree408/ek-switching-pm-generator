@@ -2,7 +2,8 @@
 import re
 import copy
 
-def change_complete_korean(word):
+
+class Generator:
 
     enH = "rRseEfaqQtTdwWczxvg"
     enB_list = [
@@ -19,108 +20,96 @@ def change_complete_korean(word):
         'fg', 'a', 'q', 'qt', 't',
         'T', 'd', 'w', 'c', 'z',
 	'x', 'v', 'g'
-    ]
-    #word = word.decode('utf-8')
-    result = ''
-    for i in range(len(word)):
-        char_code = ord(word[i])
-	if char_code < 44032 or char_code > 55203:
-            result = ''
-            break
-	char_code = char_code - 44032
-	enH_code = char_code / 588
-	enBF_code = char_code % 588
-	enB_code = enBF_code / 28
-	enF_code = enBF_code % 28
-	
-	result = result + enH[enH_code]+enB_list[enB_code]+enF_list[enF_code]
+    ]   
 
-    return result
-
-
-def is_complete_korean(word, word_frequency, option):
-
-    enH = "rRseEfaqQtTdwWczxvg"
-    regH = "[" + enH + "]"
-
-    enB_list = [
-        'k', 'o', 'i', 'O', 'j',
-        'p', 'u', 'P', 'h', 'hk',
-        'ho', 'hl', 'y', 'n', 'nj',
-        'np', 'nl', 'b', 'm', 'ml',
-        'l'
-    ]
-    enB = {}
-    for i in range(len(enB_list)):
-        enB[enB_list[i]] = i
-    regB = "hk|ho|hl|nj|np|nl|ml|k|o|i|O|j|p|u|P|h|y|n|b|m|l";
-
-    enF_list = [
-        '', 'r', 'R', 'rt', 's',
-        'sw', 'sg', 'e', 'f', 'fr',
-        'fa', 'fq', 'ft', 'fx', 'fv',
-        'fg', 'a', 'q', 'qt', 't',
-        'T', 'd', 'w', 'c', 'z',
-	'x', 'v', 'g'
-    ]
-    enF = {}
-    for i in range(len(enF_list)):
-        enF[enF_list[i]] = i
+    regH = "[rRseEfaqQtTdwWczxvg]"
+    regB = "hk|ho|hl|nj|np|nl|ml|k|o|i|O|j|p|u|P|h|y|n|b|m|l"
     regF = "rt|sw|sg|fr|fa|fq|ft|fx|fv|fg|qt|r|R|s|e|f|a|q|t|T|d|w|c|z|x|v|g|";
+    
+    def __init__(self):
+        enB_dict = {}
+        for i in range(len(self.enB_list)):
+            enB_dict[self.enB_list[i]] = i
+        enF_dict = {}
+        for i in range(len(self.enF_list)):
+            enF_dict[self.enF_list[i]] = i
+        self.enB = enB_dict
+	self.enF = enF_dict
+        self.regex = "("+self.regH+")("+self.regB+")(("+self.regF+")(?=("+self.regH+")("+self.regB+"))|("+self.regF+"))"
 
-    regex = "("+regH+")("+regB+")(("+regF+")(?=("+regH+")("+regB+"))|("+regF+"))";
+    def change_complete_korean(self, word):
 
-    c = re.compile(regex)
-
-    english = len(word)
-
-    result = {}
-    for i in range(len(word)):
-	if i == 0:
-            continue
-        temp = word[0:i+1]
-        korean = 0
-	while len(temp) != 0:
-            m = c.match(temp)
-	    if bool(m) == True:
-                korean = korean + len(m.group(0))
-                temp = temp[len(m.group(0)):]
-            else:
+        result = ''
+        for i in range(len(word)):
+            char_code = ord(word[i])
+            if char_code < 44032 or char_code > 55203:
+                result = ''
                 break
+            char_code = char_code - 44032
+            enH_code = char_code / 588
+            enBF_code = char_code % 588
+            enB_code = enBF_code / 28
+            enF_code = enBF_code % 28
+	
+            result = result + self.enH[enH_code]+self.enB_list[enB_code]+self.enF_list[enF_code]
 
-        final = {}
-	if korean == 0:
-            if option == 0:
-                final[0] = 1.0 * (float(word_frequency) / 1000000000)
-            else:
-                final[0] = 1.0
-        else:
-            final[0] = 0.0
+        return result
 
-        for j in range(i+1):
-            if j == 0:
+    def is_complete_korean(self, args):
+        word = args[0]
+	word_frequency = args[1]
+	option = args[2]
+
+        c = re.compile(self.regex)
+
+        english = len(word)
+
+        result = {}
+        for i in range(len(word)):
+            if i == 0:
                 continue
-            if j + 1 == korean:
-                if option == 0:
-                    final[j+1] = 1.0 * (float(word_frequency) / 1000000000)
+            temp = word[0:i+1]
+            korean = 0
+            while len(temp) != 0:
+                m = c.match(temp)
+	        if bool(m) == True:
+                    korean = korean + len(m.group(0))
+                    temp = temp[len(m.group(0)):]
                 else:
-		    final[j+1] = 1.0
+                    break
+
+            final = {}
+            if korean == 0:
+                if option == 0:
+                    final[0] = 1.0 * (float(word_frequency) / 1000000000)
+                else:
+                    final[0] = 1.0
             else:
-                final[j+1] = 0.0
-        result[i+1] = final
-    return [english, result]
+                final[0] = 0.0
 
+            for j in range(i+1):
+                if j == 0:
+                    continue
+                if j + 1 == korean:
+                    if option == 0:
+                        final[j+1] = 1.0 * (float(word_frequency) / 1000000000)
+                    else:
+                        final[j+1] = 1.0
+                else:
+                    final[j+1] = 0.0
+            result[i+1] = final
 
-
-def wrapper(args):
-    return is_complete_korean(*args)
+        return [english, result]
 
 
 def calculator(input_file, option):
+
+    generator = Generator()
+    
     f = open(input_file, 'r')
     lines = f.readlines()
 
-    input_seq = []
+    result = []
     for line in lines:
 	temp = []
         if option == 0:
@@ -129,14 +118,10 @@ def calculator(input_file, option):
 	    temp.append(words[2])
         else:
             dic = line.decode('utf-8').split('\n')[0]
-            temp.append(change_complete_korean(dic))
+            temp.append(generator.change_complete_korean(dic))
             temp.append(0)
 	temp.append(option)
-	input_seq.append(temp)
-
-    from multiprocessing import Pool
-    pool = Pool(processes = 8)
-    result = pool.map(wrapper, input_seq)
+	result.append(generator.is_complete_korean(temp))
 
     final_result = {}
     for i in range(len(result)):
