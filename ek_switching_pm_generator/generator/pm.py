@@ -19,7 +19,7 @@ class Generator:
         'fa', 'fq', 'ft', 'fx', 'fv',
         'fg', 'a', 'q', 'qt', 't',
         'T', 'd', 'w', 'c', 'z',
-	'x', 'v', 'g'
+        'x', 'v', 'g'
     ]   
 
     regH = "[rRseEfaqQtTdwWczxvg]"
@@ -34,7 +34,7 @@ class Generator:
         for i in range(len(self.enF_list)):
             enF_dict[self.enF_list[i]] = i
         self.enB = enB_dict
-	self.enF = enF_dict
+        self.enF = enF_dict
         self.regex = "("+self.regH+")("+self.regB+")(("+self.regF+")(?=("+self.regH+")("+self.regB+"))|("+self.regF+"))"
 
     def change_complete_korean(self, word):
@@ -50,15 +50,15 @@ class Generator:
             enBF_code = char_code % 588
             enB_code = enBF_code / 28
             enF_code = enBF_code % 28
-	
+    
             result = result + self.enH[enH_code]+self.enB_list[enB_code]+self.enF_list[enF_code]
 
         return result
 
     def is_complete_korean(self, args):
         word = args[0]
-	word_frequency = args[1]
-	option = args[2]
+        word_frequency = args[1]
+        option = args[2]
 
         c = re.compile(self.regex)
 
@@ -72,7 +72,7 @@ class Generator:
             korean = 0
             while len(temp) != 0:
                 m = c.match(temp)
-	        if bool(m) == True:
+                if bool(m) == True:
                     korean = korean + len(m.group(0))
                     temp = temp[len(m.group(0)):]
                 else:
@@ -101,65 +101,62 @@ class Generator:
 
         return [english, result]
 
+    def calculator(self, input_file, option):
 
-def calculator(input_file, option):
+        f = open(input_file, 'r')
+        lines = f.readlines()
 
-    generator = Generator()
-    
-    f = open(input_file, 'r')
-    lines = f.readlines()
-
-    result = []
-    for line in lines:
-	temp = []
-        if option == 0:
-            words = line.split('	')
-	    temp.append(words[1])
-	    temp.append(words[2])
-        else:
-            dic = line.decode('utf-8').split('\n')[0]
-            temp.append(generator.change_complete_korean(dic))
-            temp.append(0)
-	temp.append(option)
-	result.append(generator.is_complete_korean(temp))
-
-    final_result = {}
-    for i in range(len(result)):
-	if result[i][0] in final_result.keys():
-            for key in final_result[result[i][0]].keys():
-                for sub_key in final_result[result[i][0]][key].keys():
-                    if result[i][1][key][sub_key] != 0:
-                        updated = final_result[result[i][0]][key][sub_key]
-                        updated = updated + result[i][1][key][sub_key]
-                        del final_result[result[i][0]][key][sub_key]
-		        final_result[result[i][0]][key][sub_key] = updated
-        else:
-            final_result[result[i][0]] = {}
-            for key in result[i][1].keys():
-                final_result[result[i][0]][key] = {}
-                for sub_key in result[i][1][key].keys():
-                    final_result[result[i][0]][key][sub_key] = result[i][1][key][sub_key]
-
-    temp_final_result = copy.deepcopy(final_result)
-    change_final_result = {}
-    for key in temp_final_result.keys():
-        for sub_key in temp_final_result[key].keys():
-            if sub_key in change_final_result.keys():
-                for trb_key in temp_final_result[key][sub_key].keys():
-                    updated = change_final_result[sub_key][trb_key]
-                    updated = updated + temp_final_result[key][sub_key][trb_key]
-		    del change_final_result[sub_key][trb_key]
-		    change_final_result[sub_key][trb_key] = updated
+        result = []
+        for line in lines:
+            args = []
+            if option == 0:
+                words = line.split('\t')
+                args.append(words[1])
+                args.append(words[2])
             else:
-                change_final_result[sub_key] = temp_final_result[key][sub_key]
+                dic = line.decode('utf-8').split('\n')[0]
+                args.append(self.change_complete_korean(dic))
+                args.append(0)
+            args.append(option)
+            result.append(self.is_complete_korean(args))
 
-    for key in change_final_result.keys():
-        sum_c = 0.0
-        for sub_key in change_final_result[key].keys():
-            sum_c = sum_c + change_final_result[key][sub_key]
-        for sub_key in change_final_result[key].keys():
-            updated_c = (change_final_result[key][sub_key] / sum_c) * 100
-            del change_final_result[key][sub_key]
-	    change_final_result[key][sub_key] = round(updated_c, 2)
-    f.close()
-    return change_final_result
+        final_result = {}
+        for i in range(len(result)):
+            if result[i][0] in final_result.keys():
+                for key in final_result[result[i][0]].keys():
+                    for sub_key in final_result[result[i][0]][key].keys():
+                        if result[i][1][key][sub_key] != 0:
+                            updated = final_result[result[i][0]][key][sub_key]
+                            updated = updated + result[i][1][key][sub_key]
+                            del final_result[result[i][0]][key][sub_key]
+                            final_result[result[i][0]][key][sub_key] = updated
+            else:
+                final_result[result[i][0]] = {}
+                for key in result[i][1].keys():
+                    final_result[result[i][0]][key] = {}
+                    for sub_key in result[i][1][key].keys():
+                        final_result[result[i][0]][key][sub_key] = result[i][1][key][sub_key]
+
+        temp_final_result = copy.deepcopy(final_result)
+        change_final_result = {}
+        for key in temp_final_result.keys():
+            for sub_key in temp_final_result[key].keys():
+                if sub_key in change_final_result.keys():
+                    for trb_key in temp_final_result[key][sub_key].keys():
+                        updated = change_final_result[sub_key][trb_key]
+                        updated = updated + temp_final_result[key][sub_key][trb_key]
+                        del change_final_result[sub_key][trb_key]
+                        change_final_result[sub_key][trb_key] = updated
+                else:
+                    change_final_result[sub_key] = temp_final_result[key][sub_key]
+
+        for key in change_final_result.keys():
+            sum_c = 0.0
+            for sub_key in change_final_result[key].keys():
+                sum_c = sum_c + change_final_result[key][sub_key]
+            for sub_key in change_final_result[key].keys():
+                updated_c = (change_final_result[key][sub_key] / sum_c) * 100
+                del change_final_result[key][sub_key]
+                change_final_result[key][sub_key] = round(updated_c, 2)
+        f.close()
+        return change_final_result
