@@ -1,4 +1,4 @@
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 import re
 import copy
 
@@ -20,12 +20,12 @@ class Generator:
         'fg', 'a', 'q', 'qt', 't',
         'T', 'd', 'w', 'c', 'z',
         'x', 'v', 'g'
-    ]   
+    ]
 
     regH = "[rRseEfaqQtTdwWczxvg]"
     regB = "hk|ho|hl|nj|np|nl|ml|k|o|i|O|j|p|u|P|h|y|n|b|m|l"
-    regF = "rt|sw|sg|fr|fa|fq|ft|fx|fv|fg|qt|r|R|s|e|f|a|q|t|T|d|w|c|z|x|v|g|";
-    
+    regF = "rt|sw|sg|fr|fa|fq|ft|fx|fv|fg|qt|r|R|s|e|f|a|q|t|T|d|w|c|z|x|v|g|"
+
     def __init__(self):
         enB_dict = {}
         for i in range(len(self.enB_list)):
@@ -35,7 +35,12 @@ class Generator:
             enF_dict[self.enF_list[i]] = i
         self.enB = enB_dict
         self.enF = enF_dict
-        self.regex = "("+self.regH+")("+self.regB+")(("+self.regF+")(?=("+self.regH+")("+self.regB+"))|("+self.regF+"))"
+        regH_block = "("+self.regH+")"
+        regB_block = "("+self.regB+")"
+        regF_item_first = "("+self.regF+")"
+        regF_item_second = "(?=("+self.regH+")("+self.regB+"))|("+self.regF+")"
+        regF_block = "(" + regF_item_first + regF_item_second + ")"
+        self.regex = regH_block + regB_block + regF_block
 
     def change_complete_korean(self, word):
 
@@ -50,9 +55,10 @@ class Generator:
             enBF_code = char_code % 588
             enB_code = enBF_code / 28
             enF_code = enBF_code % 28
-    
-            result = result + self.enH[enH_code]+self.enB_list[enB_code]+self.enF_list[enF_code]
-
+            enH_char = self.enH[enH_code]
+            enB_char = self.enB_list[enB_code]
+            enF_char = self.enF_list[enF_code]
+            result = result + enH_char + enB_char + enF_char
         return result
 
     def is_complete_korean(self, args):
@@ -72,7 +78,7 @@ class Generator:
             korean = 0
             while len(temp) != 0:
                 m = c.match(temp)
-                if bool(m) == True:
+                if bool(m):
                     korean = korean + len(m.group(0))
                     temp = temp[len(m.group(0)):]
                 else:
@@ -127,7 +133,7 @@ class Generator:
                     for sub_key in final_result[result[i][0]][key].keys():
                         if result[i][1][key][sub_key] != 0:
                             updated = final_result[result[i][0]][key][sub_key]
-                            updated = updated + result[i][1][key][sub_key]
+                            updated += result[i][1][key][sub_key]
                             del final_result[result[i][0]][key][sub_key]
                             final_result[result[i][0]][key][sub_key] = updated
             else:
@@ -135,25 +141,26 @@ class Generator:
                 for key in result[i][1].keys():
                     final_result[result[i][0]][key] = {}
                     for sub_key in result[i][1][key].keys():
-                        final_result[result[i][0]][key][sub_key] = result[i][1][key][sub_key]
+                        korean_freq = result[i][1][key][sub_key]
+                        final_result[result[i][0]][key][sub_key] = korean_freq
 
-        temp_final_result = copy.deepcopy(final_result)
+        temp_result = copy.deepcopy(final_result)
         change_final_result = {}
-        for key in temp_final_result.keys():
-            for sub_key in temp_final_result[key].keys():
+        for key in temp_result.keys():
+            for sub_key in temp_result[key].keys():
                 if sub_key in change_final_result.keys():
-                    for trb_key in temp_final_result[key][sub_key].keys():
+                    for trb_key in temp_result[key][sub_key].keys():
                         updated = change_final_result[sub_key][trb_key]
-                        updated = updated + temp_final_result[key][sub_key][trb_key]
+                        updated += temp_result[key][sub_key][trb_key]
                         del change_final_result[sub_key][trb_key]
                         change_final_result[sub_key][trb_key] = updated
                 else:
-                    change_final_result[sub_key] = temp_final_result[key][sub_key]
+                    change_final_result[sub_key] = temp_result[key][sub_key]
 
         for key in change_final_result.keys():
             sum_c = 0.0
             for sub_key in change_final_result[key].keys():
-                sum_c = sum_c + change_final_result[key][sub_key]
+                sum_c += change_final_result[key][sub_key]
             for sub_key in change_final_result[key].keys():
                 updated_c = (change_final_result[key][sub_key] / sum_c) * 100
                 del change_final_result[key][sub_key]
