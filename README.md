@@ -1,3 +1,4 @@
-### #reseacrh
-## ek-switching-pm-generator
-probabilistic model generator which explains switching correlation between english &amp; korean
+> #reseacrh
+# English & Korean Switching Probabilistic Model Generator
+
+Probabilistic model generator which explains switching correlation between english & korean.
